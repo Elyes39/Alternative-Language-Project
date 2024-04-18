@@ -19,6 +19,12 @@ public class Main {
         try (CSVReader reader = new CSVReader(new FileReader("cells.csv"));
                 CSVWriter writer = new CSVWriter(new FileWriter("cleaned_cells.csv"))) {
 
+            // Additional data structures for the questions
+            Map<String, List<Float>> weightsByOem = new HashMap<>();
+            List<Cell> differentYearPhones = new ArrayList<>();
+            int singleSensorPhones = 0;
+            Map<Integer, Integer> phonesByYear = new HashMap<>();
+
             String[] columns;
             int index = 0;
             while ((columns = reader.readNext()) != null) {
@@ -32,10 +38,10 @@ public class Main {
                 }
                 for (int i = 0; i < columns.length; i++) {
                     if (columns[i] == null || columns[i].isEmpty() || columns[i].equals("-")) {
-                        columns[i] = "null"; 
+                        columns[i] = "null"; // Replace with a default value
 
                     } else {
-                        Matcher m; 
+                        Matcher m; // Declare the Matcher variable here
                         switch (i) {
                             case 2: // launch_announced
                             case 3: // launch_status
@@ -88,7 +94,8 @@ public class Main {
                         Matcher m = Pattern.compile("\\d{4}").matcher(columns[4]);
                         if (m.find()) {
                             columns[i] = m.group(); // Move the year to the launch_status field
-                            columns[4] = columns[4].replace(m.group(), "").trim(); // Remove the year from the launch_announced field
+                            columns[4] = columns[4].replace(m.group(), "").trim(); // Remove the year from the
+                                                                                   // launch_date field
                         }
                     }
                 }
@@ -108,7 +115,41 @@ public class Main {
                 System.out.println("Cell at index " + index + ": " + cell);
                 writer.writeNext(columns);
 
+                // Collect data for the questions
+                if (cell.getBodyWeight() != null) {
+                    weightsByOem.computeIfAbsent(cell.getOem(), k -> new ArrayList<>()).add(cell.getBodyWeight());
+                }
+                if (cell.getLaunchAnnounced() != null && cell.getLaunchStatus() != null
+                && !String.valueOf(cell.getLaunchAnnounced()).equals(cell.getLaunchStatus())) {
+                differentYearPhones.add(cell);
+                }
+                if (cell.getFeaturesSensors() != null && cell.getFeaturesSensors().split(",").length == 1) {
+                    singleSensorPhones++;
+                }
+                if (cell.getLaunchAnnounced() != null && cell.getLaunchAnnounced() > 1999) {
+                    phonesByYear.merge(cell.getLaunchAnnounced(), 1, Integer::sum);
+                }
+            }
 
+            // Answer the questions
+            Map.Entry<String, List<Float>> maxWeightOem = weightsByOem.entrySet().stream()
+                    .max(Comparator.comparingDouble(
+                            e -> e.getValue().stream().mapToDouble(Float::floatValue).average().orElse(0)))
+                    .orElse(null);
+            System.out.println("Company with the highest average weight: "
+                    + (maxWeightOem != null ? maxWeightOem.getKey() : "N/A"));
+
+            System.out.println("Phones announced in one year and released in another:");
+            for (Cell cell : differentYearPhones) {
+                System.out.println("OEM: " + cell.getOem() + ", Model: " + cell.getModel());
+            }
+
+            System.out.println("Number of phones with only one feature sensor: " + singleSensorPhones);
+
+            Map.Entry<Integer, Integer> maxYear = phonesByYear.entrySet().stream()
+                    .max(Map.Entry.comparingByValue())
+                    .orElse(null);
+            System.out.println("Year with the most phones launched: " + (maxYear != null ? maxYear.getKey() : "N/A"));
 
         } catch (IOException | CsvValidationException e) {
             e.printStackTrace();
