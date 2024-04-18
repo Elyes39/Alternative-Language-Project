@@ -38,7 +38,7 @@ public class Main {
                 }
                 for (int i = 0; i < columns.length; i++) {
                     if (columns[i] == null || columns[i].isEmpty() || columns[i].equals("-")) {
-                        columns[i] = "null"; // Replace with a default value
+                        columns[i] = "null"; // Replace empty values with "null"
 
                     } else {
                         Matcher m; // Declare the Matcher variable here
@@ -95,7 +95,7 @@ public class Main {
                         if (m.find()) {
                             columns[i] = m.group(); // Move the year to the launch_status field
                             columns[4] = columns[4].replace(m.group(), "").trim(); // Remove the year from the
-                                                                                   // launch_date field
+                                                                                   // launch_announced field
                         }
                     }
                 }
@@ -120,8 +120,8 @@ public class Main {
                     weightsByOem.computeIfAbsent(cell.getOem(), k -> new ArrayList<>()).add(cell.getBodyWeight());
                 }
                 if (cell.getLaunchAnnounced() != null && cell.getLaunchStatus() != null
-                && !String.valueOf(cell.getLaunchAnnounced()).equals(cell.getLaunchStatus())) {
-                differentYearPhones.add(cell);
+                        && !String.valueOf(cell.getLaunchAnnounced()).equals(cell.getLaunchStatus())) {
+                    differentYearPhones.add(cell);
                 }
                 if (cell.getFeaturesSensors() != null && cell.getFeaturesSensors().split(",").length == 1) {
                     singleSensorPhones++;
