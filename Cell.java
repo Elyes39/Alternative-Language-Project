@@ -1,5 +1,10 @@
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class Cell {
     private String oem;
@@ -163,4 +168,67 @@ public class Cell {
         this.platformOs = platformOs;
     }
 
+    @Override
+    public String toString() {
+        return "Cell{" +
+                "\n\toem='" + oem + '\'' +
+                ",\n\tmodel='" + model + '\'' +
+                ",\n\tlaunchAnnounced=" + launchAnnounced +
+                ",\n\tlaunchStatus='" + launchStatus + '\'' +
+                ",\n\tbodyDimensions='" + bodyDimensions + '\'' +
+                ",\n\tbodyWeight=" + bodyWeight +
+                ",\n\tbodySim='" + bodySim + '\'' +
+                ",\n\tdisplayType='" + displayType + '\'' +
+                ",\n\tdisplaySize=" + displaySize +
+                ",\n\tdisplayResolution='" + displayResolution + '\'' +
+                ",\n\tfeaturesSensors='" + featuresSensors + '\'' +
+                ",\n\tplatformOs='" + platformOs + '\'' +
+                '}';
+    }
+
+    public static float calculateMeanDisplaySize(List<Cell> cells) {
+        float sum = 0;
+        for (Cell cell : cells) {
+            sum += cell.getDisplaySize();
+        }
+        return sum / cells.size();
+    }
+
+    public static float calculateMedianDisplaySize(List<Cell> cells) {
+        List<Float> sizes = new ArrayList<>();
+        for (Cell cell : cells) {
+            sizes.add(cell.getDisplaySize());
+        }
+        Collections.sort(sizes);
+        if (sizes.size() % 2 == 0) {
+            return (sizes.get(sizes.size() / 2 - 1) + sizes.get(sizes.size() / 2)) / 2;
+        } else {
+            return sizes.get(sizes.size() / 2);
+        }
+    }
+
+    public static float calculateStandardDeviationDisplaySize(List<Cell> cells) {
+        float mean = calculateMeanDisplaySize(cells);
+        float sum = 0;
+        for (Cell cell : cells) {
+            sum += Math.pow(cell.getDisplaySize() - mean, 2);
+        }
+        return (float) Math.sqrt(sum / cells.size());
+    }
+
+    public static Set<String> getUniqueModels(List<Cell> cells) {
+        Set<String> models = new HashSet<>();
+        for (Cell cell : cells) {
+            models.add(cell.getModel());
+        }
+        return models;
+    }
+
+    public static void addCell(List<Cell> cells, Cell cell) {
+        cells.add(cell);
+    }
+
+    public static void removeCell(List<Cell> cells, Cell cell) {
+        cells.remove(cell);
+    }
 }
