@@ -16,8 +16,8 @@ import java.util.Comparator;
 public class Main {
     public static void main(String[] args) {
         Map<Integer, Cell> cells = new HashMap<>();
-        try (CSVReader reader = new CSVReader(new FileReader("cells.csv"));
-                CSVWriter writer = new CSVWriter(new FileWriter("cleaned_cells.csv"))) {
+        try (CSVReader reader = new CSVReader(new FileReader("src/main/java/cells.csv"));
+                CSVWriter writer = new CSVWriter(new FileWriter("src/main/java/cleaned_cells.csv"))) {
 
             // Additional data structures for the questions
             Map<String, List<Float>> weightsByOem = new HashMap<>();
