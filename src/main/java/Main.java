@@ -15,11 +15,15 @@ import java.util.Comparator;
 
 public class Main {
     public static void main(String[] args) {
+        // Create a map to store cell data
         Map<Integer, Cell> cells = new HashMap<>();
-        try (CSVReader reader = new CSVReader(new FileReader("src/main/java/cells.csv"));
-                CSVWriter writer = new CSVWriter(new FileWriter("src/main/java/cleaned_cells.csv"))) {
-
-            // Additional data structures for the questions
+        try (
+            // Create a CSV reader to read from the cells.csv file
+            CSVReader reader = new CSVReader(new FileReader("src/main/java/cells.csv"));
+            // Create a CSV writer to write to the cleaned_cells.csv file
+            CSVWriter writer = new CSVWriter(new FileWriter("src/main/java/cleaned_cells.csv"))
+        ) {
+            // Create additional data structures for the questions
             Map<String, List<Float>> weightsByOem = new HashMap<>();
             List<Cell> differentYearPhones = new ArrayList<>();
             int singleSensorPhones = 0;
@@ -27,27 +31,33 @@ public class Main {
 
             String[] columns;
             int index = 0;
+            // Read each line from the CSV file
             while ((columns = reader.readNext()) != null) {
                 if (index++ == 0) {
+                    // Write the header to the cleaned_cells.csv file
                     writer.writeNext(columns);
                     continue;
                 }
+                // Ensure that each line has 12 columns
                 while (columns.length < 12) {
                     columns = Arrays.copyOf(columns, columns.length + 1);
                     columns[columns.length - 1] = "null";
                 }
+                // Process each column in the line
                 for (int i = 0; i < columns.length; i++) {
+                    // Replace empty values with "null"
                     if (columns[i] == null || columns[i].isEmpty() || columns[i].equals("-")) {
-                        columns[i] = "null"; // Replace empty values with "null"
-
+                        columns[i] = "null";
                     } else {
                         Matcher m; // Declare the Matcher variable here
                         switch (i) {
-                            case 2: // launch_announced
-                            case 3: // launch_status
+                            // Process the launch_announced and launch_status columns
+                            case 2:
+                            case 3:
                                 if (columns[i].equals("Discontinued") || columns[i].equals("Cancelled")) {
                                     // Keep the original value
                                 } else {
+                                    // Extract the year from the column
                                     m = Pattern.compile("\\d{4}").matcher(columns[i]);
                                     if (m.find()) {
                                         columns[i] = m.group();
@@ -56,7 +66,9 @@ public class Main {
                                     }
                                 }
                                 break;
-                            case 5: // body_weight
+                            // Process the body_weight column
+                            case 5:
+                                // Extract the weight from the column
                                 m = Pattern.compile("\\d+").matcher(columns[i]);
                                 if (m.find()) {
                                     columns[i] = m.group();
@@ -64,12 +76,15 @@ public class Main {
                                     columns[i] = "null";
                                 }
                                 break;
-                            case 6: // body_sim
+                            // Process the body_sim column
+                            case 6:
                                 if (columns[i].equalsIgnoreCase("No") || columns[i].equalsIgnoreCase("Yes")) {
                                     columns[i] = "null";
                                 }
                                 break;
-                            case 8: // display_size
+                            // Process the display_size column
+                            case 8:
+                                // Extract the size from the column
                                 m = Pattern.compile("(\\d+(\\.\\d+)?)\\s*inches").matcher(columns[i]);
                                 if (m.find()) {
                                     try {
@@ -82,7 +97,8 @@ public class Main {
                                     columns[i] = "null";
                                 }
                                 break;
-                            case 11: // platform_os
+                            // Process the platform_os column
+                            case 11:
                                 int commaIndex = columns[i].indexOf(',');
                                 if (commaIndex != -1) {
                                     columns[i] = columns[i].substring(0, commaIndex);
@@ -90,15 +106,16 @@ public class Main {
                                 break;
                         }
                     }
+                    // Move the year to the launch_status field if it's null
                     if (i == 3 && columns[i].equals("null")) {
                         Matcher m = Pattern.compile("\\d{4}").matcher(columns[4]);
                         if (m.find()) {
-                            columns[i] = m.group(); // Move the year to the launch_status field
-                            columns[4] = columns[4].replace(m.group(), "").trim(); // Remove the year from the
-                                                                                   // launch_announced field
+                            columns[i] = m.group();
+                            columns[4] = columns[4].replace(m.group(), "").trim();
                         }
                     }
                 }
+                // Create a new Cell object and add it to the map
                 Cell cell = new Cell(columns[0],
                         columns[1],
                         columns[2],
@@ -113,6 +130,7 @@ public class Main {
                         columns[11]);
                 cells.put(index, cell);
                 System.out.println("Cell at index " + index + ": " + cell);
+                // Write the processed line to the cleaned_cells.csv file
                 writer.writeNext(columns);
 
                 // Collect data for the questions
@@ -152,6 +170,7 @@ public class Main {
             System.out.println("Year with the most phones launched: " + (maxYear != null ? maxYear.getKey() : "N/A"));
 
         } catch (IOException | CsvValidationException e) {
+            // Print the stack trace if an exception is thrown
             e.printStackTrace();
         }
     }
