@@ -23,14 +23,14 @@ Exception handling in Java is done using try, catch, and finally blocks. Java ha
 Three libraries used in this project are Apache Commons Lang, JUnit, and OpenCSV. Apache Commons Lang provides a host of helper utilities for the Java language, enhancing the core Java libraries. JUnit is a widely-used testing framework for Java applications. It provides annotations to identify test methods and contains assertions for testing expected results. OpenCSV is a simple library for reading and writing CSV files in Java. In this project, it's used to read data from a CSV file and write data to another CSV file.
 
 ## What company (oem) has the highest average weight of the phone body?
-![alt text](image.png)
+![alt text](Assets/image.png)
 
 ## Was there any phones that were announced in one year and released in another? What are they? Give me the oem and models.
-![alt text](image-1.png) ![alt text](image-2.png)
-![alt text](image-3.png) ![alt text](image-4.png)
+![alt text](Assets/image-1.png) ![alt text](Assets/image-2.png)
+![alt text](Assets/image-3.png) ![alt text](Assets/image-4.png)
 
 ## How many phones have only one feature sensor?
-![alt text](image-5.png)
+![alt text](Assets/image-5.png)
 
 ## What year had the most phones launched in any year later than 1999?
-![alt text](image-6.png)
+![alt text](Assets/image-6.png)
